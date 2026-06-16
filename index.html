@@ -853,10 +853,9 @@
             // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
             const originalWidth = zona.style.width;
             const originalMaxWidth = zona.style.maxWidth;
-            // Fijamos dimensiones a 1450px fijos para garantizar el formato horizontal alargado
-            // Al capturar con scale: 3.0, la imagen resultante será enorme y nítida al expandirla
-            zona.style.width = '1450px';
-            zona.style.maxWidth = '1450px';
+            // Fijamos dimensiones a 1180px fijos (simulando 2 niveles de zoom hacia adentro para agrupar más las columnas y fuentes)
+            zona.style.width = '1180px';
+            zona.style.maxWidth = '1180px';
  
             setTimeout(() => {
                 html2canvas(zona, { 
