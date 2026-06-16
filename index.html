@@ -854,10 +854,10 @@
             const originalTransform = zona.style.transform;
             const originalTransformOrigin = zona.style.transformOrigin;
 
-            // Fijamos dimensiones y aplicamos un zoom mediante CSS transform
-            zona.style.width = '1000px';
-            zona.style.maxWidth = '1000px';
-            zona.style.transform = 'scale(1.4)';
+            // Fijamos dimensiones horizontales (1450px) y aplicamos un transform moderado para mantener alta definicion
+            zona.style.width = '1450px';
+            zona.style.maxWidth = '1450px';
+            zona.style.transform = 'scale(1.1)';
             zona.style.transformOrigin = 'top left';
 
             setTimeout(() => {
