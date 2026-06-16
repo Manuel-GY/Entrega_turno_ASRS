@@ -400,7 +400,6 @@
             box-shadow: var(--shadow-lg) !important;
         }
 
-        /* Ajustes para evitar que el reporte se estire y se capture pequeño o con scroll */
         #zonaCaptura {
             max-width: 1280px;
             width: 100%;
@@ -408,6 +407,35 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+        }
+        /* Empty State con Bienvenida */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .empty-state h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .empty-state p {
+            font-size: 14px;
+            color: var(--muted);
+            max-width: 500px;
+            line-height: 1.5;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
@@ -456,8 +484,9 @@
 
     <div id="zonaCaptura">
         <div id="emptyState" class="empty-state">
-            <div class="icon">📊</div>
-            <p>Selecciona una fecha y turno para cargar los datos.</p>
+            <div class="icon">👋</div>
+            <h1>¡Buenos días!</h1>
+            <p>Bienvenido a la Interfaz de Entrega de Turno ASRS.<br>Por favor, selecciona la fecha y el turno a consultar en el panel lateral.</p>
         </div>
 
         <div id="gridMain" class="grid-main" style="display:none">
@@ -808,6 +837,12 @@
                 throw new Error('No se encontró el contenedor #zonaCaptura.');
             }
 
+            // Forzar un ancho fijo grande durante la captura para evitar encogimiento o scrolls internos
+            const originalWidth = zona.style.width;
+            const originalMaxWidth = zona.style.maxWidth;
+            zona.style.width = '1280px';
+            zona.style.maxWidth = '1280px';
+
             setTimeout(() => {
                 html2canvas(zona, { 
                     scale: 3.0, // Aumentado a 3.0 para que la imagen resultante sea más grande y nítida
@@ -819,6 +854,8 @@
                     
                     // Función unificada para restaurar la interfaz
                     const restaurarUI = () => {
+                        zona.style.width = originalWidth;
+                        zona.style.maxWidth = originalMaxWidth;
                         if (sidebar) sidebar.style.display = '';
                         if (printDiv) printDiv.remove();
                         if (ta) ta.style.display = 'block';
