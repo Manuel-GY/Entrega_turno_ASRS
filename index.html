@@ -824,7 +824,6 @@
             btn.textContent = 'Procesando...';
             btn.disabled = true;
             const bgColor = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#f1f5f9';
-            const zona = document.getElementById('zonaCaptura');
  
             // Ocultar elementos que no queremos en el reporte (si hubiese alguno)
             const ta = document.getElementById('comentarioGeneral');
@@ -854,14 +853,14 @@
             // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
             const originalWidth = zona.style.width;
             const originalMaxWidth = zona.style.maxWidth;
-            // Fijamos dimensiones a 1080px fijos. Al ser más estrecha que tu monitor (que está al 80%), las letras y columnas se agrupan
-            // Al capturar con scale: 4.0, la imagen resultante será enorme y nítida al expandirla
-            zona.style.width = '1080px';
-            zona.style.maxWidth = '1080px';
-
+            // Fijamos dimensiones a 1450px fijos para garantizar el formato horizontal alargado
+            // Al capturar con scale: 3.0, la imagen resultante será enorme y nítida al expandirla
+            zona.style.width = '1450px';
+            zona.style.maxWidth = '1450px';
+ 
             setTimeout(() => {
                 html2canvas(zona, { 
-                    scale: 4.0, 
+                    scale: 3.0, 
                     backgroundColor: bgColor, 
                     logging: false,
                     useCORS: true,
