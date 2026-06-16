@@ -188,9 +188,9 @@ def consultar():
         total_consultas = len(res_tabla)
 
         if timeout_count == total_consultas:
-            raise Exception("Error de Red: No se pudo conectar al servidor ASRS (10.107.194.62). Verifica tu VPN, cable de red o que estés logueado en la intranet.")
+            raise Exception("Se requiere iniciar sesión en el portal MyPlant (Intranet) o verificar tu conexión VPN para consultar los datos del ASRS.")
         elif auth_error_count == total_consultas:
-            raise Exception("Error de Autenticación: Faltan credenciales o no estás logueado en MyPlant para acceder al servidor ASRS.")
+            raise Exception("Se requiere iniciar sesión en el portal MyPlant (Intranet) para acceder al servidor ASRS.")
 
         # Calcular promedios
         df = pd.DataFrame(res_tabla)
