@@ -825,7 +825,7 @@
             tempContainer.style.position = 'fixed';
             tempContainer.style.left = '-9999px';
             tempContainer.style.top = '0';
-            tempContainer.style.width = '960px'; // Compactamos el ancho a 960px
+            tempContainer.style.width = '1920px'; // Forzamos ancho de pantalla completa Full HD
             tempContainer.style.background = bgColor;
             tempContainer.style.zIndex = '-9999';
             document.body.appendChild(tempContainer);
@@ -848,14 +848,14 @@
                 if (input.tagName.toLowerCase() === 'textarea') {
                     const div = document.createElement('div');
                     div.style.width = '100%';
-                    div.style.minHeight = '120px';
+                    div.style.minHeight = '140px';
                     div.style.border = '1px solid var(--border)';
                     div.style.borderRadius = '6px';
                     div.style.background = 'var(--input-bg)';
                     div.style.color = 'var(--text)';
-                    div.style.padding = '14px';
+                    div.style.padding = '18px';
                     div.style.fontFamily = 'inherit';
-                    div.style.fontSize = '16px';
+                    div.style.fontSize = '20px';
                     div.style.lineHeight = '1.6';
                     div.style.whiteSpace = 'pre-wrap';
                     div.style.wordBreak = 'break-word';
@@ -866,8 +866,8 @@
                     span.textContent = val || (originalInput.placeholder !== '—' ? originalInput.placeholder : '');
                     span.style.display = 'inline-block';
                     span.style.width = '100%';
-                    span.style.fontSize = '15px';
-                    span.style.fontWeight = '600';
+                    span.style.fontSize = '18px';
+                    span.style.fontWeight = '700';
                     span.style.color = 'var(--text)';
                     
                     if (originalInput.classList.contains('inp-com')) {
@@ -880,34 +880,34 @@
             });
 
             // Ajustar dinámicamente el viewport y estilos del contenedor temporal para maximizar legibilidad en Teams
-            clone.style.width = '960px';
-            clone.style.maxWidth = '960px';
-            clone.style.padding = '20px';
+            clone.style.width = '1920px';
+            clone.style.maxWidth = '1920px';
+            clone.style.padding = '40px';
             clone.style.background = bgColor;
 
-            // Escalar fuentes y espaciado de tablas y KPIs en el clon
+            // Escalar fuentes y espaciado de tablas y KPIs en el clon (Full HD optimizado)
             clone.querySelectorAll('table').forEach(table => {
-                table.style.fontSize = '15px';
+                table.style.fontSize = '18px';
             });
             clone.querySelectorAll('th').forEach(th => {
-                th.style.fontSize = '13px';
-                th.style.padding = '14px 10px';
+                th.style.fontSize = '16px';
+                th.style.padding = '18px 12px';
             });
             clone.querySelectorAll('td').forEach(td => {
-                td.style.height = '54px';
-                td.style.padding = '8px 6px';
+                td.style.height = '64px';
+                td.style.padding = '12px 8px';
             });
             clone.querySelectorAll('.hora-texto').forEach(el => {
-                el.style.fontSize = '14px';
+                el.style.fontSize = '18px';
             });
             clone.querySelectorAll('.meta-texto').forEach(el => {
-                el.style.fontSize = '13px';
+                el.style.fontSize = '16px';
             });
             clone.querySelectorAll('.kpi-val').forEach(el => {
-                el.style.fontSize = '38px';
+                el.style.fontSize = '48px';
             });
             clone.querySelectorAll('.kpi-label').forEach(el => {
-                el.style.fontSize = '12px';
+                el.style.fontSize = '14px';
             });
 
             setTimeout(() => {
