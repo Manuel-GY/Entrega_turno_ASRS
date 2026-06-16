@@ -1,0 +1,6 @@
+flask
+selenium
+pandas
+requests
+urllib3
+beautifulsoup4

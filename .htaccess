@@ -1,0 +1,3 @@
+# Denegar acceso directo a la base de datos sqlite en Apache
+RewriteEngine On
+RewriteRule ^db_data/.*$ - [F,L]

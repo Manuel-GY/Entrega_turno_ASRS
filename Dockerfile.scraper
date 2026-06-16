@@ -1,0 +1,28 @@
+FROM python:3.10-slim
+
+# Instalar Firefox y dependencias necesarias para Selenium Headless en Debian/Ubuntu
+RUN apt-get update && apt-get install -y \
+    firefox-esr \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Descargar e instalar Geckodriver para Firefox
+RUN wget -q "https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz" -O /tmp/geckodriver.tar.gz \
+    && tar -xzf /tmp/geckodriver.tar.gz -C /usr/local/bin/ \
+    && rm /tmp/geckodriver.tar.gz
+
+WORKDIR /app
+
+# Instalar dependencias Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar el scraper
+COPY server.py .
+
+# Variables de entorno para Selenium en Docker Linux
+ENV FIREFOX_BINARY=/usr/bin/firefox
+
+EXPOSE 8081
+
+CMD ["python", "server.py"]
