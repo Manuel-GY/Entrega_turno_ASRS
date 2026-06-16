@@ -117,27 +117,6 @@ def consultar_datos_directo(str_ts, end_ts, hora_inicio, hora_fin):
         "outbound": out_v
     }
 
-def capturar_grafico_selenium():
-    img_grafico_b64 = None
-    driver = None
-    try:
-        driver = get_driver()
-        driver.set_window_size(1920, 1080)
-        driver.get(URL_ROBOTS)
-        time.sleep(1.8)
-        
-        tmp_img = os.path.join(tempfile.gettempdir(), "asrs_kpi.png")
-        driver.execute_script("document.body.style.zoom='100%'")
-        container = driver.find_element(By.CSS_SELECTOR, "div.col-5")
-        container.screenshot(tmp_img)
-        img_grafico_b64 = img_to_base64(tmp_img)
-    except Exception as ex_selenium:
-        print(f"Aviso: Fallo en captura de gráfico: {ex_selenium}")
-    finally:
-        if driver is not None:
-            driver.quit()
-    return img_grafico_b64
-
 # ================= 4. RUTAS DEL SERVIDOR =================
 
 @app.route('/')
@@ -186,13 +165,11 @@ def consultar():
         
         # 3. Lanzar concurrente
         with ThreadPoolExecutor(max_workers=14) as executor:
-            futuro_grafico = executor.submit(capturar_grafico_selenium)
             futuros_horas = [
                 executor.submit(consultar_datos_directo, t[0], t[1], t[2], t[3])
                 for t in tareas_horas
             ]
             res_tabla = [f.result() for f in futuros_horas]
-            img_grafico_b64 = futuro_grafico.result()
             
         # Calcular promedios
         df = pd.DataFrame(res_tabla)
@@ -231,7 +208,6 @@ def consultar():
         return jsonify({
             "tabla": res_tabla, 
             "kpis": kpis, 
-            "img_grafico": img_grafico_b64,
             "comentario_general": com_gen,
             "saved": True
         })

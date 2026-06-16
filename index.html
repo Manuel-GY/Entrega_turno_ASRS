@@ -492,8 +492,6 @@
                         <div class="kpi-val" id="kpiOut">—</div>
                     </div>
                 </div>
-                <div class="card-title" style="margin-top:10px;border-bottom:none">Distribución</div>
-                <div id="imgChart"></div>
             </div>
         </div>
 
@@ -771,12 +769,6 @@
         // KPIs
         document.getElementById('kpiIn').textContent  = data.kpis?.inbound  ?? '—';
         document.getElementById('kpiOut').textContent = data.kpis?.outbound ?? '—';
-
-        // Gráfico (solo si viene de API Python)
-        const chartDiv = document.getElementById('imgChart');
-        chartDiv.innerHTML = data.img_grafico
-            ? `<img src="data:image/png;base64,${data.img_grafico}" style="width:100%;border-radius:4px">`
-            : '<p style="text-align:center;color:var(--muted);font-size:12px;padding:10px">Sin gráfico disponible</p>';
     }
 
     // ---- CAPTURA ----
