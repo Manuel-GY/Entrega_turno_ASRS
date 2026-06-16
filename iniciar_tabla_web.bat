@@ -1,15 +1,12 @@
 @echo off
-echo Iniciando Servidores para Tabla Web ASRS...
+echo Iniciando Servidor Unificado Python ASRS...
 
-:: 1. Iniciar el servidor de Scraping (Python) en una ventana nueva
-start "Scraper Python" cmd /k "python server.py"
+:: 1. Iniciar el servidor Python (Flask + DB + Scraper)
+start "Servidor Python ASRS" cmd /k "python server.py"
 
-:: 2. Iniciar el servidor Web (PHP) usando la ruta de XAMPP
-start "Web PHP" cmd /k "C:\xampp\php\php.exe -S localhost:8083"
-
-:: 3. Esperar un momento y abrir el navegador
+:: 2. Esperar un momento y abrir el navegador directo al puerto 8081 de Python
 timeout /t 3
-start http://localhost:8083/index.html
+start http://localhost:8081/
 
-echo Todo en marcha. No cierres las ventanas de comandos mientras uses la tabla.
+echo Todo en marcha. No cierres la ventana de comando de Python mientras uses la tabla.
 pause
