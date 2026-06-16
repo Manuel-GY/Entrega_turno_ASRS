@@ -99,22 +99,31 @@ def consultar_datos_directo(str_ts, end_ts, hora_inicio, hora_fin):
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     in_v, out_v = 0.0, 0.0
+    status_error = None
     try:
         r = requests.post(URL_DATOS, data=payload, headers=headers, timeout=12, verify=False)
         if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            cells = soup.find_all('td', class_='data1')
-            if len(cells) > 8:
-                in_v = float(cells[6].text.strip().replace(",", "."))
-                out_v = float(cells[8].text.strip().replace(",", "."))
+            # Si el servidor responde pero nos redirige al login o nos da acceso denegado
+            if "login" in r.url.lower() or "auth" in r.url.lower():
+                status_error = "auth_error"
+            else:
+                soup = BeautifulSoup(r.text, 'html.parser')
+                cells = soup.find_all('td', class_='data1')
+                if len(cells) > 8:
+                    in_v = float(cells[6].text.strip().replace(",", "."))
+                    out_v = float(cells[8].text.strip().replace(",", "."))
+        else:
+            status_error = f"http_status_{r.status_code}"
     except Exception as e:
         print(f"Error en consulta HTTP directa ({str_ts} - {end_ts}): {e}")
+        status_error = "network_timeout"
     
     return {
         "hora_inicio": hora_inicio,
         "hora_fin": hora_fin,
         "inbound": in_v,
-        "outbound": out_v
+        "outbound": out_v,
+        "error_status": status_error
     }
 
 # ================= 4. RUTAS DEL SERVIDOR =================
@@ -173,15 +182,25 @@ def consultar():
             ]
             res_tabla = [f.result() for f in futuros_horas]
             
-        # Calcular promedios
-        df = pd.DataFrame(res_tabla)
-        if not df.empty:
-            df_nonzero = df[(df["inbound"] > 0) | (df["outbound"] > 0)]
-            if not df_nonzero.empty:
-                kpis = {
-                    "inbound": round(df_nonzero["inbound"].mean(), 1),
-                    "outbound": round(df_nonzero["outbound"].mean(), 1)
-                }
+         # Analizar si hubo un error global de conexión o credenciales
+         timeout_count = sum(1 for f in res_tabla if f.get("error_status") == "network_timeout")
+         auth_error_count = sum(1 for f in res_tabla if f.get("error_status") == "auth_error")
+         total_consultas = len(res_tabla)
+
+         if timeout_count == total_consultas:
+             raise Exception("Error de Red: No se pudo conectar al servidor ASRS (10.107.194.62). Verifica tu VPN, cable de red o que estés logueado en la intranet.")
+         elif auth_error_count == total_consultas:
+             raise Exception("Error de Autenticación: Faltan credenciales o no estás logueado en MyPlant para acceder al servidor ASRS.")
+
+         # Calcular promedios
+         df = pd.DataFrame(res_tabla)
+         if not df.empty:
+             df_nonzero = df[(df["inbound"] > 0) | (df["outbound"] > 0)]
+             if not df_nonzero.empty:
+                 kpis = {
+                     "inbound": round(df_nonzero["inbound"].mean(), 1),
+                     "outbound": round(df_nonzero["outbound"].mean(), 1)
+                 }
 
         # 4. Guardar automáticamente en la base de datos (Upsert)
         conn = sqlite3.connect(DB_FILE)
