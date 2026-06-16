@@ -182,25 +182,25 @@ def consultar():
             ]
             res_tabla = [f.result() for f in futuros_horas]
             
-         # Analizar si hubo un error global de conexión o credenciales
-         timeout_count = sum(1 for f in res_tabla if f.get("error_status") == "network_timeout")
-         auth_error_count = sum(1 for f in res_tabla if f.get("error_status") == "auth_error")
-         total_consultas = len(res_tabla)
+        # Analizar si hubo un error global de conexión o credenciales
+        timeout_count = sum(1 for f in res_tabla if f.get("error_status") == "network_timeout")
+        auth_error_count = sum(1 for f in res_tabla if f.get("error_status") == "auth_error")
+        total_consultas = len(res_tabla)
 
-         if timeout_count == total_consultas:
-             raise Exception("Error de Red: No se pudo conectar al servidor ASRS (10.107.194.62). Verifica tu VPN, cable de red o que estés logueado en la intranet.")
-         elif auth_error_count == total_consultas:
-             raise Exception("Error de Autenticación: Faltan credenciales o no estás logueado en MyPlant para acceder al servidor ASRS.")
+        if timeout_count == total_consultas:
+            raise Exception("Error de Red: No se pudo conectar al servidor ASRS (10.107.194.62). Verifica tu VPN, cable de red o que estés logueado en la intranet.")
+        elif auth_error_count == total_consultas:
+            raise Exception("Error de Autenticación: Faltan credenciales o no estás logueado en MyPlant para acceder al servidor ASRS.")
 
-         # Calcular promedios
-         df = pd.DataFrame(res_tabla)
-         if not df.empty:
-             df_nonzero = df[(df["inbound"] > 0) | (df["outbound"] > 0)]
-             if not df_nonzero.empty:
-                 kpis = {
-                     "inbound": round(df_nonzero["inbound"].mean(), 1),
-                     "outbound": round(df_nonzero["outbound"].mean(), 1)
-                 }
+        # Calcular promedios
+        df = pd.DataFrame(res_tabla)
+        if not df.empty:
+            df_nonzero = df[(df["inbound"] > 0) | (df["outbound"] > 0)]
+            if not df_nonzero.empty:
+                kpis = {
+                    "inbound": round(df_nonzero["inbound"].mean(), 1),
+                    "outbound": round(df_nonzero["outbound"].mean(), 1)
+                }
 
         # 4. Guardar automáticamente en la base de datos (Upsert)
         conn = sqlite3.connect(DB_FILE)
