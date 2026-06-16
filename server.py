@@ -133,7 +133,9 @@ def consultar():
     if not fecha or not turno:
         return jsonify({"error": "Faltan parámetros fecha o turno"}), 400
 
-    # Ajuste de turno de noche
+    # Para turnos nocturnos, la consulta web externa debe iniciar el día anterior,
+    # pero toda la información se guarda bajo la fecha del turno seleccionada (fecha_oficial)
+    fecha_oficial = fecha
     fecha_proceso = fecha
     if turno in ['T3_8H', 'T_NOCHE_12H']:
         d_temp = datetime.strptime(fecha, "%Y-%m-%d") - timedelta(days=1)
@@ -196,10 +198,10 @@ def consultar():
                     inbound = excluded.inbound,
                     outbound = excluded.outbound,
                     raw_json = excluded.raw_json
-            """, (fecha, turno, fila['hora_inicio'], fila['hora_fin'], fila['inbound'], fila['outbound'], str(fila)))
+            """, (fecha_oficial, turno, fila['hora_inicio'], fila['hora_fin'], fila['inbound'], fila['outbound'], str(fila)))
         
         # Obtener comentario general si existe
-        c.execute("SELECT comentario_general FROM resumen_turno WHERE fecha = ? AND turno = ?", (fecha, turno))
+        c.execute("SELECT comentario_general FROM resumen_turno WHERE fecha = ? AND turno = ?", (fecha_oficial, turno))
         res_g = c.fetchone()
         com_gen = res_g[0] if res_g else ""
         conn.commit()
