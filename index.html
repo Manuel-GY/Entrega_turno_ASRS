@@ -474,6 +474,9 @@
             <div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">Cargando...</div>
         </div>
     </div>
+    <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border); font-size:10px; color:var(--muted); text-align:center; font-weight:600; letter-spacing:0.5px;">
+        Desarrollado por Manuel Rivera - ASRS
+    </div>
 </aside>
 
 <main class="main">
@@ -854,10 +857,10 @@
             const originalTransform = zona.style.transform;
             const originalTransformOrigin = zona.style.transformOrigin;
 
-            // Fijamos dimensiones horizontales (1450px) y aplicamos un transform moderado para mantener alta definicion
-            zona.style.width = '1450px';
-            zona.style.maxWidth = '1450px';
-            zona.style.transform = 'scale(1.1)';
+            // Fijamos dimensiones horizontales (1300px) y aplicamos un transform más enfocado (1.25) para 'acercar' la captura
+            zona.style.width = '1300px';
+            zona.style.maxWidth = '1300px';
+            zona.style.transform = 'scale(1.25)';
             zona.style.transformOrigin = 'top left';
 
             setTimeout(() => {
