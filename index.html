@@ -723,7 +723,6 @@
         document.getElementById('comentarioGeneral').value = data.comentario_general || '';
 
         document.getElementById('badgeTurno').textContent = `${formatearFecha(fecha)} · ${labelTurno(turno)}`;
-        document.getElementById('fechaInput').value = toLocalDate(fecha);
         document.getElementById('turnoInput').value = turno;
 
         const tbody = document.getElementById('tablaTbody');

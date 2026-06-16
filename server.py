@@ -133,8 +133,11 @@ def consultar():
     if not fecha or not turno:
         return jsonify({"error": "Faltan parámetros fecha o turno"}), 400
 
-    # Usar la fecha tal cual es enviada por el frontend
+    # Ajuste de turno de noche
     fecha_proceso = fecha
+    if turno in ['T3_8H', 'T_NOCHE_12H']:
+        d_temp = datetime.strptime(fecha, "%Y-%m-%d") - timedelta(days=1)
+        fecha_proceso = d_temp.strftime("%Y-%m-%d")
 
     res_tabla, kpis = [], {"inbound": 0, "outbound": 0}
     
