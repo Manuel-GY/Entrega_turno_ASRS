@@ -465,7 +465,6 @@
     <button class="btn btn-primary" onclick="consultarDatos()" id="btnBuscar">Actualizar Datos</button>
     <button class="btn btn-save"    onclick="guardarComentarios()" id="btnGuardar" style="display:none">💾 Guardar Comentarios</button>
     <button class="btn btn-dark"    onclick="copiarImagen()"       id="btnCapture" style="display:none">📋 Copiar Reporte</button>
-    <button class="btn btn-theme"   onclick="toggleTheme()">🌙 Cambiar Tema</button>
 
     <div id="loading">Procesando...</div>
 
@@ -484,7 +483,6 @@
 
     <div id="zonaCaptura">
         <div id="emptyState" class="empty-state">
-            <div class="icon">👋</div>
             <h1>¡Buenos días!</h1>
             <p>Bienvenido a la Interfaz de Entrega de Turno ASRS.<br>Por favor, selecciona la fecha y el turno a consultar en el panel lateral.</p>
         </div>
@@ -804,48 +802,117 @@
         const btn = document.getElementById('btnCapture');
         if (!btn) return;
 
-        const sidebar = document.querySelector('.sidebar');
-        const ta = document.getElementById('comentarioGeneral');
-        let printDiv = null;
-
         // Validar preventivamente si html2canvas está cargado
         if (typeof html2canvas === 'undefined') {
             toast('Error: La librería html2canvas no está cargada en la página.', true);
             return;
         }
 
+        const zona = document.getElementById('zonaCaptura');
+        if (!zona) {
+            toast('Error: No se encontró el contenedor #zonaCaptura.', true);
+            return;
+        }
+
         try {
             btn.textContent = 'Procesando...';
             btn.disabled = true;
-            if (sidebar) sidebar.style.display = 'none';
 
-            // Workaround para html2canvas: No renderiza bien los saltos de línea en textarea
-            if (ta) {
-                printDiv = document.createElement('div');
-                printDiv.style.cssText = ta.style.cssText;
-                printDiv.style.height = ta.style.height;
-                printDiv.innerHTML = escapeHTML(ta.value).replace(/\n/g, '<br>');
-                ta.parentNode.insertBefore(printDiv, ta);
-                ta.style.display = 'none';
-            }
-
-            // Obtener color de fondo actual para evitar transparencias (que se ven negras en Teams)
             const bgColor = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#f1f5f9';
-            const zona = document.getElementById('zonaCaptura');
 
-            if (!zona) {
-                throw new Error('No se encontró el contenedor #zonaCaptura.');
-            }
+            // Crear un contenedor temporal oculto (off-screen) para ajustar dinámicamente el layout y escala
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '960px'; // Compactamos el ancho a 960px
+            tempContainer.style.background = bgColor;
+            tempContainer.style.zIndex = '-9999';
+            document.body.appendChild(tempContainer);
 
-            // Forzar un ancho fijo grande durante la captura para evitar encogimiento o scrolls internos
-            const originalWidth = zona.style.width;
-            const originalMaxWidth = zona.style.maxWidth;
-            zona.style.width = '1280px';
-            zona.style.maxWidth = '1280px';
+            // Clonar la zona de captura para no afectar la interacción del usuario en tiempo real
+            const clone = zona.cloneNode(true);
+            tempContainer.appendChild(clone);
+
+            // Reemplazar inputs y textareas en el clon por elementos estáticos estilizados de forma robusta
+            const originalInputs = zona.querySelectorAll('input.input-cell, textarea');
+            const cloneInputs = clone.querySelectorAll('input.input-cell, textarea');
+
+            cloneInputs.forEach((input, index) => {
+                const originalInput = originalInputs[index];
+                if (!originalInput) return;
+
+                const val = originalInput.value;
+                const parent = input.parentNode;
+
+                if (input.tagName.toLowerCase() === 'textarea') {
+                    const div = document.createElement('div');
+                    div.style.width = '100%';
+                    div.style.minHeight = '120px';
+                    div.style.border = '1px solid var(--border)';
+                    div.style.borderRadius = '6px';
+                    div.style.background = 'var(--input-bg)';
+                    div.style.color = 'var(--text)';
+                    div.style.padding = '14px';
+                    div.style.fontFamily = 'inherit';
+                    div.style.fontSize = '16px';
+                    div.style.lineHeight = '1.6';
+                    div.style.whiteSpace = 'pre-wrap';
+                    div.style.wordBreak = 'break-word';
+                    div.innerHTML = escapeHTML(val).replace(/\n/g, '<br>');
+                    parent.replaceChild(div, input);
+                } else {
+                    const span = document.createElement('span');
+                    span.textContent = val || (originalInput.placeholder !== '—' ? originalInput.placeholder : '');
+                    span.style.display = 'inline-block';
+                    span.style.width = '100%';
+                    span.style.fontSize = '15px';
+                    span.style.fontWeight = '600';
+                    span.style.color = 'var(--text)';
+                    
+                    if (originalInput.classList.contains('inp-com')) {
+                        span.style.textAlign = 'left';
+                    } else {
+                        span.style.textAlign = 'center';
+                    }
+                    parent.replaceChild(span, input);
+                }
+            });
+
+            // Ajustar dinámicamente el viewport y estilos del contenedor temporal para maximizar legibilidad en Teams
+            clone.style.width = '960px';
+            clone.style.maxWidth = '960px';
+            clone.style.padding = '20px';
+            clone.style.background = bgColor;
+
+            // Escalar fuentes y espaciado de tablas y KPIs en el clon
+            clone.querySelectorAll('table').forEach(table => {
+                table.style.fontSize = '15px';
+            });
+            clone.querySelectorAll('th').forEach(th => {
+                th.style.fontSize = '13px';
+                th.style.padding = '14px 10px';
+            });
+            clone.querySelectorAll('td').forEach(td => {
+                td.style.height = '54px';
+                td.style.padding = '8px 6px';
+            });
+            clone.querySelectorAll('.hora-texto').forEach(el => {
+                el.style.fontSize = '14px';
+            });
+            clone.querySelectorAll('.meta-texto').forEach(el => {
+                el.style.fontSize = '13px';
+            });
+            clone.querySelectorAll('.kpi-val').forEach(el => {
+                el.style.fontSize = '38px';
+            });
+            clone.querySelectorAll('.kpi-label').forEach(el => {
+                el.style.fontSize = '12px';
+            });
 
             setTimeout(() => {
-                html2canvas(zona, { 
-                    scale: 3.0, // Aumentado a 3.0 para que la imagen resultante sea más grande y nítida
+                html2canvas(clone, { 
+                    scale: 3.0, // Alta definición para que la imagen final sea extremadamente nítida
                     backgroundColor: bgColor, 
                     logging: false,
                     useCORS: true,
@@ -854,11 +921,7 @@
                     
                     // Función unificada para restaurar la interfaz
                     const restaurarUI = () => {
-                        zona.style.width = originalWidth;
-                        zona.style.maxWidth = originalMaxWidth;
-                        if (sidebar) sidebar.style.display = '';
-                        if (printDiv) printDiv.remove();
-                        if (ta) ta.style.display = 'block';
+                        tempContainer.remove();
                         btn.textContent = '📋 Copiar Reporte';
                         btn.disabled = false;
                     };
@@ -914,9 +977,7 @@
                 }).catch(e => {
                     console.error('Error renderizando canvas con html2canvas:', e);
                     toast('Error al capturar: ' + e.message, true);
-                    if (sidebar) sidebar.style.display = '';
-                    if (printDiv) printDiv.remove();
-                    if (ta) ta.style.display = 'block';
+                    tempContainer.remove();
                     btn.textContent = '📋 Copiar Reporte';
                     btn.disabled = false;
                 });
@@ -925,9 +986,6 @@
         } catch (errGlobal) {
             console.error('Error global inesperado en copiarImagen:', errGlobal);
             toast('Error al iniciar la captura de pantalla.', true);
-            if (sidebar) sidebar.style.display = '';
-            if (printDiv) printDiv.remove();
-            if (ta) ta.style.display = 'block';
             btn.textContent = '📋 Copiar Reporte';
             btn.disabled = false;
         }
