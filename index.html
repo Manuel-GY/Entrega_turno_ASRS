@@ -853,10 +853,10 @@
             // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
             const originalWidth = zona.style.width;
             const originalMaxWidth = zona.style.maxWidth;
-            // Fijamos dimensiones a 1400px fijos. Este ancho ligeramente más compacto simula 
-            // 1 nivel de zoom adicional en la imagen de Teams para que se vea ideal de entrada.
-            zona.style.width = '1400px';
-            zona.style.maxWidth = '1400px';
+            // Fijamos dimensiones a 1800px fijos. Al ser una imagen extremadamente ancha y horizontal,
+            // Teams se verá obligado a expandirla por completo y de forma nativa a pantalla completa horizontal.
+            zona.style.width = '1800px';
+            zona.style.maxWidth = '1800px';
  
             setTimeout(() => {
                 html2canvas(zona, { 
