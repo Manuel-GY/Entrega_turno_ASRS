@@ -188,7 +188,7 @@ def consultar():
         total_consultas = len(res_tabla)
 
         if timeout_count == total_consultas:
-            raise Exception("Se requiere iniciar sesión en el portal MyPlant (Intranet) o verificar tu conexión VPN para consultar los datos del ASRS.")
+            raise Exception("Se requiere iniciar sesión en el portal MyPlant (Intranet) para consultar los datos del ASRS.")
         elif auth_error_count == total_consultas:
             raise Exception("Se requiere iniciar sesión en el portal MyPlant (Intranet) para acceder al servidor ASRS.")
 
