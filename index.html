@@ -817,111 +817,63 @@
         try {
             btn.textContent = 'Procesando...';
             btn.disabled = true;
-
             const bgColor = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#f1f5f9';
+            const zona = document.getElementById('zonaCaptura');
+ 
+            // Ocultar elementos que no queremos en el reporte (si hubiese alguno)
+            const ta = document.getElementById('comentarioGeneral');
+            let printDiv = null;
+            if (ta) {
+                printDiv = document.createElement('div');
+                printDiv.style.cssText = ta.style.cssText;
+                printDiv.style.height = 'auto';
+                printDiv.style.minHeight = '100px';
+                printDiv.style.fontSize = '18px';
+                printDiv.style.border = '1px solid var(--border)';
+                printDiv.style.borderRadius = '6px';
+                printDiv.style.background = 'var(--input-bg)';
+                printDiv.style.color = 'var(--text)';
+                printDiv.style.padding = '12px';
+                printDiv.style.whiteSpace = 'pre-wrap';
+                printDiv.style.wordBreak = 'break-word';
+                printDiv.innerHTML = escapeHTML(ta.value).replace(/\n/g, '<br>');
+                ta.parentNode.insertBefore(printDiv, ta);
+                ta.style.display = 'none';
+            }
 
-            // Crear un contenedor temporal oculto (off-screen) para ajustar dinámicamente el layout y escala
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'fixed';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.style.width = '1200px'; // Reducido a 1200px para compactar el espacio y simular el zoom hacia adentro
-            tempContainer.style.background = bgColor;
-            tempContainer.style.zIndex = '-9999';
-            document.body.appendChild(tempContainer);
+            // Ocultar temporalmente el menú lateral para que no altere el render
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) sidebar.style.display = 'none';
 
-            // Clonar la zona de captura para no afectar la interacción del usuario en tiempo real
-            const clone = zona.cloneNode(true);
-            tempContainer.appendChild(clone);
+            // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
+            const originalWidth = zona.style.width;
+            const originalMaxWidth = zona.style.maxWidth;
+            const originalTransform = zona.style.transform;
+            const originalTransformOrigin = zona.style.transformOrigin;
 
-            // Reemplazar inputs y textareas en el clon por elementos estáticos estilizados de forma robusta
-            const originalInputs = zona.querySelectorAll('input.input-cell, textarea');
-            const cloneInputs = clone.querySelectorAll('input.input-cell, textarea');
-
-            cloneInputs.forEach((input, index) => {
-                const originalInput = originalInputs[index];
-                if (!originalInput) return;
-
-                const val = originalInput.value;
-                const parent = input.parentNode;
-
-                if (input.tagName.toLowerCase() === 'textarea') {
-                    const div = document.createElement('div');
-                    div.style.width = '100%';
-                    div.style.minHeight = '150px';
-                    div.style.border = '1px solid var(--border)';
-                    div.style.borderRadius = '6px';
-                    div.style.background = 'var(--input-bg)';
-                    div.style.color = 'var(--text)';
-                    div.style.padding = '20px';
-                    div.style.fontFamily = 'inherit';
-                    div.style.fontSize = '24px'; // Aumentado para máximo zoom
-                    div.style.lineHeight = '1.6';
-                    div.style.whiteSpace = 'pre-wrap';
-                    div.style.wordBreak = 'break-word';
-                    div.innerHTML = escapeHTML(val).replace(/\n/g, '<br>');
-                    parent.replaceChild(div, input);
-                } else {
-                    const span = document.createElement('span');
-                    span.textContent = val || (originalInput.placeholder !== '—' ? originalInput.placeholder : '');
-                    span.style.display = 'inline-block';
-                    span.style.width = '100%';
-                    span.style.fontSize = '20px'; // Aumentado para máximo zoom
-                    span.style.fontWeight = '800';
-                    span.style.color = 'var(--text)';
-                    
-                    if (originalInput.classList.contains('inp-com')) {
-                        span.style.textAlign = 'left';
-                    } else {
-                        span.style.textAlign = 'center';
-                    }
-                    parent.replaceChild(span, input);
-                }
-            });
-
-            // Ajustar dinámicamente el viewport y estilos del contenedor temporal para maximizar legibilidad en Teams
-            clone.style.width = '1200px';
-            clone.style.maxWidth = '1200px';
-            clone.style.padding = '40px';
-            clone.style.background = bgColor;
-
-            // Escalar fuentes y espaciado de tablas y KPIs en el clon (Zoom optimizado)
-            clone.querySelectorAll('table').forEach(table => {
-                table.style.fontSize = '20px';
-            });
-            clone.querySelectorAll('th').forEach(th => {
-                th.style.fontSize = '18px';
-                th.style.padding = '20px 14px';
-            });
-            clone.querySelectorAll('td').forEach(td => {
-                td.style.height = '72px';
-                td.style.padding = '14px 10px';
-            });
-            clone.querySelectorAll('.hora-texto').forEach(el => {
-                el.style.fontSize = '20px';
-            });
-            clone.querySelectorAll('.meta-texto').forEach(el => {
-                el.style.fontSize = '18px';
-            });
-            clone.querySelectorAll('.kpi-val').forEach(el => {
-                el.style.fontSize = '60px';
-            });
-            clone.querySelectorAll('.kpi-label').forEach(el => {
-                el.style.fontSize = '18px';
-            });
+            // Fijamos dimensiones y aplicamos un zoom mediante CSS transform
+            zona.style.width = '1000px';
+            zona.style.maxWidth = '1000px';
+            zona.style.transform = 'scale(1.4)';
+            zona.style.transformOrigin = 'top left';
 
             setTimeout(() => {
-                html2canvas(clone, { 
-                    scale: 3.0, // Alta definición para que la imagen final sea extremadamente nítida
+                html2canvas(zona, { 
+                    scale: 2.5, 
                     backgroundColor: bgColor, 
                     logging: false,
                     useCORS: true,
                     allowTaint: true
                 }).then(canvas => {
                     
-                    // Función unificada para restaurar la interfaz
                     const restaurarUI = () => {
-                        tempContainer.remove();
+                        zona.style.width = originalWidth;
+                        zona.style.maxWidth = originalMaxWidth;
+                        zona.style.transform = originalTransform;
+                        zona.style.transformOrigin = originalTransformOrigin;
+                        if (sidebar) sidebar.style.display = '';
+                        if (printDiv) printDiv.remove();
+                        if (ta) ta.style.display = 'block';
                         btn.textContent = '📋 Copiar Reporte';
                         btn.disabled = false;
                     };
@@ -977,7 +929,13 @@
                 }).catch(e => {
                     console.error('Error renderizando canvas con html2canvas:', e);
                     toast('Error al capturar: ' + e.message, true);
-                    tempContainer.remove();
+                    zona.style.width = originalWidth;
+                    zona.style.maxWidth = originalMaxWidth;
+                    zona.style.transform = originalTransform;
+                    zona.style.transformOrigin = originalTransformOrigin;
+                    if (sidebar) sidebar.style.display = '';
+                    if (printDiv) printDiv.remove();
+                    if (ta) ta.style.display = 'block';
                     btn.textContent = '📋 Copiar Reporte';
                     btn.disabled = false;
                 });
