@@ -853,13 +853,14 @@
             // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
             const originalWidth = zona.style.width;
             const originalMaxWidth = zona.style.maxWidth;
-            // Fijamos dimensiones a 1180px fijos (simulando 2 niveles de zoom hacia adentro para agrupar más las columnas y fuentes)
-            zona.style.width = '1180px';
-            zona.style.maxWidth = '1180px';
+            // Fijamos dimensiones a 1600px fijos. Al ser una imagen muy ancha y apaisada, 
+            // Teams se verá obligado a expandirla ocupando todo el ancho de la conversación de chat.
+            zona.style.width = '1600px';
+            zona.style.maxWidth = '1600px';
  
             setTimeout(() => {
                 html2canvas(zona, { 
-                    scale: 5.0, 
+                    scale: 2.5, 
                     backgroundColor: bgColor, 
                     logging: false,
                     useCORS: true,
