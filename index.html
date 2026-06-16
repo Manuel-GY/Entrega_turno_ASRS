@@ -854,18 +854,14 @@
             // Zoom x3 simulado: Forzamos al DOM a ensanchar fuentes y compactamos el ancho de zonaCaptura
             const originalWidth = zona.style.width;
             const originalMaxWidth = zona.style.maxWidth;
-            const originalTransform = zona.style.transform;
-            const originalTransformOrigin = zona.style.transformOrigin;
-
-            // Fijamos dimensiones horizontales (1300px) y aplicamos un transform más enfocado (1.25) para 'acercar' la captura
-            zona.style.width = '1300px';
-            zona.style.maxWidth = '1300px';
-            zona.style.transform = 'scale(1.25)';
-            zona.style.transformOrigin = 'top left';
+            // Fijamos dimensiones a 1080px fijos. Al ser más estrecha que tu monitor (que está al 80%), las letras y columnas se agrupan
+            // Al capturar con scale: 4.0, la imagen resultante será enorme y nítida al expandirla
+            zona.style.width = '1080px';
+            zona.style.maxWidth = '1080px';
 
             setTimeout(() => {
                 html2canvas(zona, { 
-                    scale: 2.5, 
+                    scale: 4.0, 
                     backgroundColor: bgColor, 
                     logging: false,
                     useCORS: true,
@@ -875,8 +871,6 @@
                     const restaurarUI = () => {
                         zona.style.width = originalWidth;
                         zona.style.maxWidth = originalMaxWidth;
-                        zona.style.transform = originalTransform;
-                        zona.style.transformOrigin = originalTransformOrigin;
                         if (sidebar) sidebar.style.display = '';
                         if (printDiv) printDiv.remove();
                         if (ta) ta.style.display = 'block';
@@ -937,8 +931,6 @@
                     toast('Error al capturar: ' + e.message, true);
                     zona.style.width = originalWidth;
                     zona.style.maxWidth = originalMaxWidth;
-                    zona.style.transform = originalTransform;
-                    zona.style.transformOrigin = originalTransformOrigin;
                     if (sidebar) sidebar.style.display = '';
                     if (printDiv) printDiv.remove();
                     if (ta) ta.style.display = 'block';
