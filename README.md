@@ -1,69 +1,96 @@
-# ⚙️ Tabla de Turno ASRS — Standalone Python Edition
+# Tabla de Turno ASRS
 
 ![Status](https://img.shields.io/badge/Status-Activo-success?style=for-the-badge)
 ![Tech](https://img.shields.io/badge/Stack-Python%20%7C%20Flask%20%7C%20SQLite-blue?style=for-the-badge)
 
-Una solución profesional, ligera y 100% libre de PHP para la gestión y reporte de turnos en el sistema **ASRS**. Este proyecto permite extraer datos de producción en tiempo real, gestionar comentarios de turno, registrar tiempos de detención, códigos SAP y generar reportes visuales optimizados para ser compartidos en plataformas como **Microsoft Teams**.
+Solucion ligera y 100% libre de PHP para la gestion y reporte de turnos en el sistema **ASRS**. Permite extraer datos de produccion en tiempo real, gestionar comentarios de turno, registrar tiempos de detencion, codigos SAP y generar reportes visuales optimizados para compartir en **Microsoft Teams**.
 
 Desarrollado por: **Manuel Rivera - ASRS**
 
 ---
 
-## 🚀 Características Principales
+## Caracteristicas Principales
 
-- **📊 Extracción Automatizada**: Scraping concurrente y veloz de datos Inbound/Outbound mediante Python Flask.
-- **📝 Gestión de Comentarios**: Interfaz intuitiva para agregar comentarios por hora, códigos SAP, tiempos de detención y comentarios generales de turno con soporte multilínea.
-- **🖼️ Exportación Premium**: Generación de reportes en imagen de alta resolución, con fondos sólidos y diseño compacto horizontal, listos para copiar y pegar.
-- **💾 Persistencia Local**: Almacenamiento eficiente en SQLite local para mantener un historial de turnos consultados.
-
----
-
-## 🛠️ Stack Tecnológico
-
-- **Frontend**: HTML5, Vanilla CSS, JavaScript.
-- **Backend & API**: Python 3.x (Flask, Requests, ThreadPoolExecutor, Pandas).
-- **Base de Datos**: SQLite3 (Nativa de Python).
-- **Captura Visual**: html2canvas (con zoom transform optimizado para Teams).
+- **Extraccion Automatizada**: Scraping concurrente de datos Inbound/Outbound mediante Flask + ThreadPoolExecutor.
+- **Gestion de Comentarios**: Interfaz para agregar comentarios por hora, codigos SAP, tiempos de detencion y comentarios generales de turno.
+- **Exportacion Visual**: Generacion de reportes en imagen de alta resolucion (html2canvas), listos para copiar y pegar.
+- **Persistencia Local**: Almacenamiento en SQLite con historial de turnos consultados.
+- **Tema Claro/Oscuro**: Toggle de tema con persistencia en localStorage.
 
 ---
 
-## 📂 Estructura del Proyecto
+## Stack Tecnologico
 
-- `index.html`: La interfaz principal del dashboard.
-- `server.py`: El servidor Flask que aloja la API, procesa datos e interactúa con la base de datos local y el scraping.
-- `db_data/data.db`: Base de datos local autogenerada.
-- `logo-goodyear.png`: Branding corporativo.
-- `iniciar_tabla_web.bat`: Script de inicio rápido en Windows.
+- **Frontend**: HTML5, CSS, JavaScript (vanilla).
+- **Backend**: Python 3.x (Flask, Requests, ThreadPoolExecutor, Pandas, BeautifulSoup).
+- **Base de Datos**: SQLite3 nativa de Python.
+- **Captura Visual**: html2canvas.
 
 ---
 
-## 🔧 Instalación y Uso
+## Estructura del Proyecto
+
+```
+.
+├── index.html           # Interfaz principal del dashboard
+├── app.js               # Logica del frontend (JavaScript)
+├── server.py            # Servidor Flask: API, scraping, SQLite
+├── requirements.txt     # Dependencias de Python (fijadas)
+├── iniciar_tabla_web.bat# Script de inicio rapido (Windows)
+├── logo-goodyear.png    # Branding corporativo
+├── db_data/             # Directorio de la base de datos (autogenerado)
+│   └── data.db
+└── README.md
+```
+
+---
+
+## Instalacion y Uso
 
 ### 1. Requisitos Previos
-- Tener instalado **Python 3.x** con las dependencias listadas en `requirements.txt`:
-  ```bash
-  pip install -r requirements.txt
-  ```
+- Python 3.x instalado.
 
-### 2. Iniciar el Servidor
-Ejecuta el servidor Flask utilizando el archivo batch o en una terminal:
+### 2. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Iniciar el servidor
+Opcion A - Ejecutar el archivo batch:
+```
+iniciar_tabla_web.bat
+```
+
+Opcion B - Terminal:
 ```bash
 python server.py
 ```
-*El servidor iniciará en http://localhost:8081*
 
-### 3. Acceso
-Abre tu navegador en `http://localhost:8081` para comenzar a generar reportes.
-
----
-
-## 💡 Notas de Desarrollo
-
-- El sistema está optimizado para capturas de pantalla de alta densidad, permitiendo pegar directamente el reporte a tamaño completo en Microsoft Teams.
-- Los comentarios generales soportan saltos de línea y el cuadro se ajusta automáticamente para una escritura cómoda.
-- La base de datos guarda automáticamente cada consulta exitosa para evitar re-scrapear datos antiguos.
-- **Asegúrate de haber iniciado sesión en el portal MyPlant (Intranet) para que la importación de datos funcione correctamente.**
+### 4. Acceder
+Abrir http://localhost:8081 en el navegador.
 
 ---
 
-Realizado para la optimización de reportes industriales.
+## API Endpoints
+
+| Metodo | Ruta | Descripcion |
+|--------|------|-------------|
+| GET | `/` | Interfaz principal |
+| POST | `/api/consultar` | Consulta datos de un turno (scraping) |
+| POST | `/api/guardar` | Guarda comentarios y codigos SAP |
+| GET | `/api/cargar` | Carga datos guardados de un turno |
+| GET | `/api/historial` | Lista los ultimos turnos guardados |
+| POST | `/api/proxy_kpi` | Proxy para KPIs externos |
+
+---
+
+## Notas
+
+- **Sesion requerida**: Asegurate de haber iniciado sesion en el portal **MyPlant** (Intranet) para que la importacion de datos funcione correctamente.
+- La base de datos se crea automaticamente en `db_data/data.db` al primer inicio.
+- Cada consulta exitosa se guarda automaticamente para evitar re-scrapear datos antiguos.
+- El reporte visual esta optimizado para pegar directamente en Microsoft Teams a ancho completo.
+
+---
+
+Desarrollado para la optimizacion de reportes industriales.

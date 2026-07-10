@@ -1,6 +1,5 @@
-flask
-selenium
-pandas
-requests
-urllib3
-beautifulsoup4
+flask==3.1.3
+pandas==3.0.2
+requests==2.33.1
+beautifulsoup4==4.15.0
+urllib3==2.6.3

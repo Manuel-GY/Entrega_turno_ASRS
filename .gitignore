@@ -1,5 +1,8 @@
-data.db
+db_data/
 __pycache__/
 *.pyc
+*.pyo
 .DS_Store
 asrs_kpi.png
+*.db
+.env
