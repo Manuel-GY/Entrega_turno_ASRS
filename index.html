@@ -20,7 +20,6 @@
             --accent: #0b2545;
             --accent2: #facc15;
             --input-bg: #f8fafc;
-            --input-focus: #ffffff;
             --td-hover: #f1f5f9;
             --row-border: #f1f5f9;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
@@ -257,7 +256,7 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         /* ============ REPORT HEADER ============ */
@@ -291,7 +290,7 @@
             flex: 1;
         }
         .report-header-info h1 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -334,7 +333,7 @@
         .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
         .kpi-card-top {
-            padding: 20px 22px 14px;
+            padding: 20px 24px 16px;
             position: relative;
         }
         .kpi-card.kpi-inbound .kpi-card-top {
@@ -401,7 +400,7 @@
         }
 
         .kpi-card-bottom {
-            padding: 12px 22px 16px;
+            padding: 12px 24px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -495,6 +494,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .report-table-header h3 {
             color: #fff;
@@ -549,6 +549,7 @@
         tbody tr.row-fail { border-left-color: var(--red); }
 
         tbody tr:hover td { background: var(--td-hover) !important; }
+        tbody tr:last-child td { border-bottom: none; }
 
         .hora-cell {
             font-family: 'JetBrains Mono', monospace;
@@ -569,7 +570,7 @@
             top: 18%;
             height: 64%;
             width: 100%;
-            background: rgba(100,116,139,0.06);
+            background: rgba(100,116,139,0.1);
             border-radius: 0 6px 6px 0;
             overflow: hidden;
         }
@@ -578,23 +579,24 @@
             border-radius: 0 6px 6px 0;
             transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
         }
-        .bar-fill.ok { background: linear-gradient(90deg, rgba(16,185,129,0.4), rgba(16,185,129,0.15)); }
-        .bar-fill.fail { background: linear-gradient(90deg, rgba(239,68,68,0.4), rgba(239,68,68,0.15)); }
+        .bar-fill.ok { background: linear-gradient(90deg, rgba(16,185,129,0.55), rgba(16,185,129,0.25)); }
+        .bar-fill.fail { background: linear-gradient(90deg, rgba(239,68,68,0.55), rgba(239,68,68,0.25)); }
         .bar-val {
             position: relative;
             z-index: 2;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 17px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
-        .bar-val.ok { color: var(--green); }
-        .bar-val.fail { color: var(--red); }
+        .bar-val.ok { color: #059669; }
+        .bar-val.fail { color: #dc2626; }
         .bar-meta {
             position: relative;
             z-index: 2;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 9px;
-            color: var(--muted);
+            font-size: 10.5px;
+            color: #475569;
             font-weight: 600;
             margin-top: 1px;
         }
@@ -641,6 +643,7 @@
             background: linear-gradient(135deg, #0b2545, #132f4c);
             margin: 0;
             border-radius: 12px 12px 0 0;
+            border-bottom: none;
         }
         .card-ot .card-title svg { width: 18px; height: 18px; color: #fff; flex-shrink: 0; }
         .card-ot .ot-title-text {
@@ -649,16 +652,6 @@
             color: #fff;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-        }
-        .card-ot .ot-title-badge {
-            margin-left: auto;
-            background: var(--accent);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
         }
         .ot-table {
             width: 100%;
@@ -808,7 +801,7 @@
         }
     </style>
 </head>
-<body data-theme="light">
+<body>
 
 <aside class="sidebar">
     <div class="sidebar-logo">

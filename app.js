@@ -28,9 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         disableMobile: "true",
     });
 
-    const tema = localStorage.getItem("tema_tabla") || "light";
-    document.body.setAttribute("data-theme", tema);
-
     cargarHistorial();
 
     document.querySelectorAll(".btn").forEach((btn) => {
@@ -47,14 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-
-// ---- TEMA ----
-function toggleTheme() {
-    const body = document.body;
-    const nuevo = body.getAttribute("data-theme") === "light" ? "dark" : "light";
-    body.setAttribute("data-theme", nuevo);
-    localStorage.setItem("tema_tabla", nuevo);
-}
 
 // ---- FECHAS ----
 function toISODate(fStr) {
