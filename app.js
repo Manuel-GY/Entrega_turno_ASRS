@@ -398,8 +398,8 @@ function copiarImagen() {
 
         const originalWidth = zona.style.width;
         const originalMaxWidth = zona.style.maxWidth;
-        zona.style.width = "1800px";
-        zona.style.maxWidth = "1800px";
+        zona.style.width = "2000px";
+        zona.style.maxWidth = "2000px";
 
         const restaurarUI = () => {
             zona.style.width = originalWidth;
@@ -428,11 +428,14 @@ function copiarImagen() {
         };
 
         html2canvas(zona, {
-            scale: 2.5,
+            scale: 4,
             backgroundColor: bgColor,
             logging: false,
             useCORS: true,
             allowTaint: true,
+            windowWidth: 2000,
+            scrollX: 0,
+            scrollY: 0,
         }).then((canvas) => {
             const isClipboardSupported =
                 navigator.clipboard &&
@@ -452,7 +455,7 @@ function copiarImagen() {
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
-                    toast("Imagen copiada al portapapeles");
+                    toast(`Imagen copiada (${canvas.width}x${canvas.height}px)`);
                     restaurarUI();
                 } catch (err) {
                     descargarRespaldo(err.message);
