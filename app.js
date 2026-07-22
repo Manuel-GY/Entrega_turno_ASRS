@@ -380,19 +380,34 @@ function copiarImagen() {
     try {
         btn.textContent = "Procesando...";
         btn.disabled = true;
-        const bgColor = getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#f1f5f9";
-
         const sidebar = document.querySelector(".sidebar");
         if (sidebar) sidebar.style.display = "none";
 
         const originalWidth = zona.style.width;
         const originalMaxWidth = zona.style.maxWidth;
-        zona.style.width = "2000px";
-        zona.style.maxWidth = "2000px";
+        zona.style.width = "900px";
+        zona.style.maxWidth = "900px";
+        zona.classList.add("capture-mode");
+
+        const otRows = document.querySelectorAll("#tablaOT tbody tr");
+        const comments = [];
+        otRows.forEach(tr => {
+            const inp = tr.querySelector(".inp-ot");
+            if (inp && inp.value.trim()) comments.push(inp.value.trim());
+        });
+        let footerEl = null;
+        if (comments.length > 0) {
+            footerEl = document.createElement("div");
+            footerEl.className = "capture-footer";
+            footerEl.innerHTML = "<strong>Comentarios:</strong> " + escapeHTML(comments.join(" \u2502 "));
+            zona.appendChild(footerEl);
+        }
 
         const restaurarUI = () => {
             zona.style.width = originalWidth;
             zona.style.maxWidth = originalMaxWidth;
+            zona.classList.remove("capture-mode");
+            if (footerEl && footerEl.parentNode) footerEl.remove();
             if (sidebar) sidebar.style.display = "";
             btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Reporte';
             btn.disabled = false;
@@ -417,12 +432,12 @@ function copiarImagen() {
         };
 
         html2canvas(zona, {
-            scale: 4,
-            backgroundColor: bgColor,
+            scale: 3,
+            backgroundColor: "#ffffff",
             logging: false,
             useCORS: true,
             allowTaint: true,
-            windowWidth: 2000,
+            windowWidth: 900,
             scrollX: 0,
             scrollY: 0,
         }).then((canvas) => {

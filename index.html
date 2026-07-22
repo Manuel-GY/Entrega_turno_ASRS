@@ -799,6 +799,142 @@
             .report-header { flex-direction: column; text-align: center; }
             .report-header img { margin-bottom: 8px; }
         }
+
+        /* ============ MODO CAPTURA - OPTIMIZADO PARA TEAMS ============ */
+        #zonaCaptura.capture-mode {
+            width: 900px !important;
+            max-width: 900px !important;
+            padding: 0 !important;
+            gap: 8px !important;
+            background: #ffffff !important;
+        }
+        #zonaCaptura.capture-mode #reportContent {
+            gap: 8px !important;
+        }
+        #zonaCaptura.capture-mode .report-header {
+            padding: 10px 20px !important;
+            gap: 16px !important;
+            border-radius: 8px !important;
+        }
+        #zonaCaptura.capture-mode .report-header img {
+            width: 45px !important;
+        }
+        #zonaCaptura.capture-mode .report-header-info h1 {
+            font-size: 16px !important;
+            margin-bottom: 0 !important;
+            letter-spacing: 1px !important;
+        }
+        #zonaCaptura.capture-mode .report-header-info p {
+            font-size: 10px !important;
+            letter-spacing: 0.5px !important;
+        }
+        #zonaCaptura.capture-mode .report-header-badge {
+            font-size: 11px !important;
+            padding: 6px 14px !important;
+            border-radius: 6px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-grid {
+            display: flex !important;
+            gap: 8px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card {
+            flex: 1 !important;
+            border-radius: 8px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-top {
+            padding: 8px 14px 6px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-header {
+            margin-bottom: 2px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-label {
+            font-size: 9px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-icon {
+            display: none !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-value {
+            font-size: 22px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-unit {
+            font-size: 11px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-sub {
+            display: none !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-bottom {
+            padding: 4px 14px 8px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-status {
+            font-size: 9px !important;
+            padding: 3px 8px !important;
+            letter-spacing: 0.3px !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-status.status-ok {
+            background: rgba(5,150,105,0.18) !important;
+            color: #047857 !important;
+            border: 1px solid rgba(5,150,105,0.3) !important;
+        }
+        #zonaCaptura.capture-mode .kpi-card-status.status-fail {
+            background: rgba(220,38,38,0.18) !important;
+            color: #dc2626 !important;
+            border: 1px solid rgba(220,38,38,0.3) !important;
+        }
+        #zonaCaptura.capture-mode .table-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+        }
+        #zonaCaptura.capture-mode .card-ot {
+            display: none !important;
+        }
+        #zonaCaptura.capture-mode .report-table-header {
+            padding: 8px 16px !important;
+        }
+        #zonaCaptura.capture-mode .report-table-header h3 {
+            font-size: 11px !important;
+            letter-spacing: 1px !important;
+        }
+        #zonaCaptura.capture-mode th {
+            padding: 6px 8px !important;
+            font-size: 9px !important;
+        }
+        #zonaCaptura.capture-mode td {
+            padding: 4px 8px !important;
+            height: 34px !important;
+            font-size: 12px !important;
+        }
+        #zonaCaptura.capture-mode .hora-cell {
+            font-size: 12px !important;
+            color: #0f172a !important;
+        }
+        #zonaCaptura.capture-mode .bar-val {
+            font-size: 14px !important;
+        }
+        #zonaCaptura.capture-mode .bar-meta {
+            display: none !important;
+        }
+        #zonaCaptura.capture-mode .bar-fill.ok {
+            background: linear-gradient(90deg, #34d399, #6ee7b7) !important;
+        }
+        #zonaCaptura.capture-mode .bar-fill.fail {
+            background: linear-gradient(90deg, #f87171, #fca5a5) !important;
+        }
+        #zonaCaptura.capture-mode .capture-footer {
+            background: var(--input-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            font-size: 10px;
+            color: #334155;
+            font-weight: 500;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        #zonaCaptura.capture-mode .capture-footer strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+        /* ============================================================ */
     </style>
 </head>
 <body>
