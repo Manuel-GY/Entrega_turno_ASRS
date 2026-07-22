@@ -389,7 +389,7 @@ function copiarImagen() {
         zona.style.maxWidth = "900px";
         zona.classList.add("capture-mode");
 
-        const otRows = document.querySelectorAll("#tablaOT tbody tr");
+        const otRows = document.querySelectorAll("#tablaOT tr");
         const comments = [];
         otRows.forEach(tr => {
             const ot = tr.querySelector(".inp-ot");
