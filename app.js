@@ -440,7 +440,7 @@ function copiarImagen() {
         };
 
         html2canvas(zona, {
-            scale: 2,
+            scale: 3,
             backgroundColor: "#ffffff",
             logging: false,
             useCORS: true,
