@@ -32,6 +32,20 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.setAttribute("data-theme", tema);
 
     cargarHistorial();
+
+    document.querySelectorAll(".btn").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+            const ripple = document.createElement("span");
+            ripple.classList.add("ripple");
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + "px";
+            ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
+            ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
+            this.appendChild(ripple);
+            ripple.addEventListener("animationend", () => ripple.remove());
+        });
+    });
 });
 
 // ---- TEMA ----
@@ -63,6 +77,17 @@ function labelTurno(t) {
     return m[t] || t;
 }
 
+function turnoColorClass(t) {
+    if (t === "T1_8H" || t === "T_DIA_12H") return "turno-dia";
+    if (t === "T2_8H") return "turno-tarde";
+    return "turno-noche";
+}
+
+function horasTurno(t) {
+    if (t === "T_DIA_12H" || t === "T_NOCHE_12H") return 12;
+    return 8;
+}
+
 // ---- HELPERS ----
 function escapeHTML(str) {
     if (!str) return "";
@@ -77,10 +102,17 @@ function setLoading(on) {
 
 function toast(msg, error = false) {
     const el = document.getElementById("toast");
-    el.textContent = msg;
+    const iconOk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    const iconErr = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    el.innerHTML = (error ? iconErr : iconOk) + '<span>' + escapeHTML(msg) + '</span>';
     el.className = error ? "error" : "";
-    el.style.display = "block";
-    setTimeout(() => (el.style.display = "none"), 3500);
+    el.style.display = "flex";
+    el.classList.remove("toast-hide");
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => {
+        el.classList.add("toast-hide");
+        setTimeout(() => { el.style.display = "none"; }, 300);
+    }, 3500);
 }
 
 function validarFecha() {
@@ -108,7 +140,7 @@ async function consultarDatos() {
         const data = await res.json();
         if (data.error) throw new Error(data.error);
         renderizar(data, fecha, turno);
-        toast("Datos actualizados y guardados ✔");
+        toast("Datos actualizados y guardados");
         cargarHistorial();
     } catch (e) {
         toast("Error: " + e.message, true);
@@ -126,27 +158,26 @@ async function guardarComentarios() {
     const turno = document.getElementById("turnoInput").value;
 
     const filas = [];
-    document.querySelectorAll("#tablaTbody tr").forEach((tr) => {
+    document.querySelectorAll("#tablaOT tbody tr").forEach((tr) => {
         filas.push({
             hora_inicio: tr.dataset.hi,
-            comentario: tr.querySelector(".inp-com")?.value || "",
-            cod_sap: tr.querySelector(".inp-sap")?.value || "",
-            tiempo_detencion: tr.querySelector(".inp-det")?.value || "",
+            comentario: tr.querySelector(".inp-ot")?.value || "",
+            obs: tr.querySelector(".inp-obs")?.value || "",
+            cod_sap: "",
+            tiempo_detencion: "",
         });
     });
-
-    const com_gen = document.getElementById("comentarioGeneral").value;
 
     setLoading(true);
     try {
         const res = await fetch("/api/guardar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fecha, turno, filas, comentario_general: com_gen }),
+            body: JSON.stringify({ fecha, turno, filas, comentario_general: "" }),
         });
         const data = await res.json();
         if (data.error) throw new Error(data.error);
-        toast(`Guardado: ${data.guardados} filas + Comentario General ✔`);
+        toast(`Guardado: ${data.guardados} filas + Comentario General`);
         cargarHistorial();
     } catch (e) {
         toast("Error al guardar: " + e.message, true);
@@ -181,10 +212,13 @@ async function cargarDesdeBD(fecha, turno) {
 
 function calcularKpis(tabla) {
     const vals = tabla.filter((f) => f.inbound > 0 || f.outbound > 0);
-    if (!vals.length) return { inbound: "0.0", outbound: "0.0" };
+    if (!vals.length) return { inbound: "0.0", outbound: "0.0", horas: 0, cumplimiento: "0" };
     const avgIn = (vals.reduce((a, f) => a + parseFloat(f.inbound || 0), 0) / vals.length).toFixed(1);
     const avgOut = (vals.reduce((a, f) => a + parseFloat(f.outbound || 0), 0) / vals.length).toFixed(1);
-    return { inbound: avgIn, outbound: avgOut };
+    const horasConDatos = vals.length;
+    const cumple = vals.filter(f => parseFloat(f.inbound || 0) >= 11.0 && parseFloat(f.outbound || 0) >= 7.5).length;
+    const pctCumple = horasConDatos > 0 ? ((cumple / horasConDatos) * 100).toFixed(0) : "0";
+    return { inbound: avgIn, outbound: avgOut, horas: horasConDatos, cumplimiento: pctCumple };
 }
 
 // ---- HISTORIAL ----
@@ -198,68 +232,125 @@ async function cargarHistorial() {
             return;
         }
         lista.innerHTML = data.map((r) => `
-            <div class="hist-item" onclick="cargarDesdeBD('${escapeHTML(r.fecha)}','${escapeHTML(r.turno)}')">
+            <div class="hist-item ${turnoColorClass(r.turno)}" onclick="cargarDesdeBD('${escapeHTML(r.fecha)}','${escapeHTML(r.turno)}')">
                 <strong>${escapeHTML(formatearFecha(r.fecha))} &mdash; ${escapeHTML(labelTurno(r.turno))}</strong>
                 ${parseInt(r.filas)} filas &middot; ${escapeHTML(r.ultima_vez.substring(0, 16))}
             </div>`).join("");
     } catch (_) { /* silencioso */ }
 }
 
-// ---- RENDERIZAR TABLA ----
+// ---- RENDERIZAR ----
 function renderizar(data, fecha, turno, desdeBD = false) {
     document.getElementById("emptyState").style.display = "none";
-    document.getElementById("gridMain").style.display = "grid";
-    document.getElementById("extraComments").style.display = "block";
+    document.getElementById("reportContent").style.display = "flex";
+    document.getElementById("reportContent").style.flexDirection = "column";
+    document.getElementById("reportContent").style.gap = "16px";
     document.getElementById("btnGuardar").style.display = "";
     document.getElementById("btnCapture").style.display = "";
 
-    document.getElementById("comentarioGeneral").value = data.comentario_general || "";
-    document.getElementById("badgeTurno").textContent = `${formatearFecha(fecha)} · ${labelTurno(turno)}`;
+    document.getElementById("badgeTurno").textContent = `${formatearFecha(fecha)} \u00B7 ${labelTurno(turno)}`;
+    document.getElementById("reportDate").textContent = `${formatearFecha(fecha)} \u00B7 ${labelTurno(turno)}`;
     document.getElementById("turnoInput").value = turno;
 
+    const tabla = data.tabla || [];
+    // ---- TABLA PRINCIPAL ----
     const tbody = document.getElementById("tablaTbody");
     tbody.innerHTML = "";
 
-    if (!data.tabla || data.tabla.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:20px">Sin registros para este horario.</td></tr>';
-        return;
+    if (tabla.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:24px">Sin registros para este horario.</td></tr>';
+    } else {
+        tabla.forEach((fila, idx) => {
+            const ib = parseFloat(fila.inbound || 0);
+            const ob = parseFloat(fila.outbound || 0);
+            const ibPct = Math.min((ib / 15) * 100, 100);
+            const obPct = Math.min((ob / 10) * 100, 100);
+            const ibOk = ib >= 11.0;
+            const obOk = ob >= 7.5;
+            const ibCls = ibOk ? "ok" : "fail";
+            const obCls = obOk ? "ok" : "fail";
+
+            let rowCls = "";
+            if (ibOk && obOk) rowCls = "row-ok";
+            else if (ibOk || obOk) rowCls = "row-warn";
+            else if (ib > 0 || ob > 0) rowCls = "row-fail";
+
+            const tr = document.createElement("tr");
+            tr.className = rowCls;
+            tr.innerHTML = `
+                <td class="hora-cell">${escapeHTML(fila.hora_inicio)}</td>
+                <td class="hora-cell">${escapeHTML(fila.hora_fin)}</td>
+                <td class="bar-cell">
+                    <div class="bar-track"><div class="bar-fill ${ibCls}" style="width:${ibPct}%"></div></div>
+                    <div>
+                        <span class="bar-val ${ibCls}">${ib > 0 ? ib.toFixed(1) : "0.0"}</span>
+                        <div class="bar-meta">meta 11.0</div>
+                    </div>
+                </td>
+                <td class="bar-cell">
+                    <div class="bar-track"><div class="bar-fill ${obCls}" style="width:${obPct}%"></div></div>
+                    <div>
+                        <span class="bar-val ${obCls}">${ob > 0 ? ob.toFixed(1) : "0.0"}</span>
+                        <div class="bar-meta">meta 7.5</div>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
-    data.tabla.forEach((fila, idx) => {
-        const ib = parseFloat(fila.inbound || 0);
-        const ob = parseFloat(fila.outbound || 0);
-        const ibPct = Math.min((ib / 15) * 100, 100);
-        const obPct = Math.min((ob / 10) * 100, 100);
-        const ibCol = ib >= 11.0 ? "#10b981" : "#ef4444";
-        const obCol = ob >= 7.5 ? "#10b981" : "#ef4444";
-        const defCom = idx === 0 ? "TURNO ANTERIOR" : (fila.comentario || "");
-        const defSap = fila.cod_sap || "";
-        const defDet = fila.tiempo_detencion || "";
-
+    // ---- TABLA OT ----
+    const tbodyOT = document.getElementById("tablaOT");
+    tbodyOT.innerHTML = "";
+    tabla.forEach((fila, idx) => {
         const tr = document.createElement("tr");
         tr.dataset.hi = fila.hora_inicio || "";
+        const defVal = fila.comentario || "";
         tr.innerHTML = `
-            <td class="hora-texto">${escapeHTML(fila.hora_inicio)}</td>
-            <td class="hora-texto">${escapeHTML(fila.hora_fin)}</td>
-            <td class="meta-texto">11.0</td>
-            <td style="position:relative;text-align:left;padding-left:12px">
-                <div style="position:absolute;left:0;top:15%;height:70%;width:${ibPct}%;background:${ibCol};opacity:.15;border-radius:0 4px 4px 0;z-index:1"></div>
-                <span style="position:relative;z-index:2;font-weight:800;color:${ibCol};font-size:14px">${ib > 0 ? ib.toFixed(1) : "0.0"}</span>
-            </td>
-            <td class="meta-texto">7.5</td>
-            <td style="position:relative;text-align:left;padding-left:12px">
-                <div style="position:absolute;left:0;top:15%;height:70%;width:${obPct}%;background:${obCol};opacity:.15;border-radius:0 4px 4px 0;z-index:1"></div>
-                <span style="position:relative;z-index:2;font-weight:800;color:${obCol};font-size:14px">${ob > 0 ? ob.toFixed(1) : "0.0"}</span>
-            </td>
-            <td><input type="text" class="input-cell inp-com" value="${escapeHTML(defCom)}" autocomplete="off" style="text-align: left;"></td>
-            <td><input type="text" class="input-cell inp-det" value="${escapeHTML(defDet)}" autocomplete="off" placeholder="\u2014" style="text-align: center; font-family: 'JetBrains Mono', monospace;"></td>
-            <td><input type="text" class="input-cell inp-sap" value="${escapeHTML(defSap)}" autocomplete="off" style="text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: bold;"></td>
+            <td><input type="text" class="ot-input inp-ot ${idx === 0 ? 'is-muted' : ''}" value="${escapeHTML(defVal)}" autocomplete="off"></td>
+            <td><input type="text" class="ot-input inp-obs" value="${escapeHTML(fila.obs || '')}" autocomplete="off" placeholder="\u2014"></td>
         `;
-        tbody.appendChild(tr);
+        tbodyOT.appendChild(tr);
     });
+    // Fila vacía adicional
+    const trExtra = document.createElement("tr");
+    trExtra.innerHTML = `
+        <td><input type="text" class="ot-input inp-ot" value="" autocomplete="off"></td>
+        <td><input type="text" class="ot-input inp-obs" value="" autocomplete="off" placeholder="\u2014"></td>
+    `;
+    tbodyOT.appendChild(trExtra);
 
-    document.getElementById("kpiIn").textContent = data.kpis?.inbound ?? "\u2014";
-    document.getElementById("kpiOut").textContent = data.kpis?.outbound ?? "\u2014";
+    // ---- KPIs ----
+    const avgIn = data.kpis?.inbound ?? "\u2014";
+    const avgOut = data.kpis?.outbound ?? "\u2014";
+
+    document.getElementById("kpiIn").textContent = avgIn;
+    document.getElementById("kpiOut").textContent = avgOut;
+
+    // Bar widths
+    const inNum = parseFloat(avgIn);
+    const outNum = parseFloat(avgOut);
+    document.getElementById("kpiBarIn").style.width = (!isNaN(inNum) ? Math.min((inNum / 15) * 100, 100) : 0) + "%";
+    document.getElementById("kpiBarOut").style.width = (!isNaN(outNum) ? Math.min((outNum / 10) * 100, 100) : 0) + "%";
+
+    // Badges
+    const badgeIn = document.getElementById("kpiBadgeIn");
+    const badgeOut = document.getElementById("kpiBadgeOut");
+
+    if (!isNaN(inNum)) {
+        badgeIn.className = "kpi-card-status " + (inNum >= 11.0 ? "status-ok" : "status-fail");
+        badgeIn.textContent = inNum >= 11.0 ? "\u2713 Cumple" : "\u2717 Bajo meta";
+    } else {
+        badgeIn.className = "kpi-card-status";
+        badgeIn.textContent = "";
+    }
+    if (!isNaN(outNum)) {
+        badgeOut.className = "kpi-card-status " + (outNum >= 7.5 ? "status-ok" : "status-fail");
+        badgeOut.textContent = outNum >= 7.5 ? "\u2713 Cumple" : "\u2717 Bajo meta";
+    } else {
+        badgeOut.className = "kpi-card-status";
+        badgeOut.textContent = "";
+    }
 }
 
 // ---- CAPTURA ----
@@ -283,26 +374,6 @@ function copiarImagen() {
         btn.disabled = true;
         const bgColor = getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#f1f5f9";
 
-        const ta = document.getElementById("comentarioGeneral");
-        let printDiv = null;
-        if (ta) {
-            printDiv = document.createElement("div");
-            printDiv.style.cssText = ta.style.cssText;
-            printDiv.style.height = "100px";
-            printDiv.style.border = "1px solid var(--border)";
-            printDiv.style.borderRadius = "6px";
-            printDiv.style.background = "var(--input-bg)";
-            printDiv.style.color = "var(--text)";
-            printDiv.style.padding = "12px";
-            printDiv.style.fontFamily = "inherit";
-            printDiv.style.fontSize = "14px";
-            printDiv.style.whiteSpace = "pre-wrap";
-            printDiv.style.wordBreak = "break-word";
-            printDiv.innerHTML = escapeHTML(ta.value).replace(/\n/g, "<br>");
-            ta.parentNode.insertBefore(printDiv, ta);
-            ta.style.display = "none";
-        }
-
         const sidebar = document.querySelector(".sidebar");
         if (sidebar) sidebar.style.display = "none";
 
@@ -315,9 +386,7 @@ function copiarImagen() {
             zona.style.width = originalWidth;
             zona.style.maxWidth = originalMaxWidth;
             if (sidebar) sidebar.style.display = "";
-            if (printDiv) printDiv.remove();
-            if (ta) ta.style.display = "block";
-            btn.textContent = "\uD83D\uDCCB Copiar Reporte";
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Reporte';
             btn.disabled = false;
         };
 
@@ -364,7 +433,7 @@ function copiarImagen() {
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
-                    toast("Imagen copiada al portapapeles ✔");
+                    toast("Imagen copiada al portapapeles");
                     restaurarUI();
                 } catch (err) {
                     descargarRespaldo(err.message);
@@ -378,7 +447,7 @@ function copiarImagen() {
     } catch (err) {
         console.error("Error global copiarImagen:", err);
         toast("Error al iniciar la captura de pantalla.", true);
-        btn.textContent = "\uD83D\uDCCB Copiar Reporte";
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar Reporte';
         btn.disabled = false;
     }
 }
