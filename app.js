@@ -385,8 +385,8 @@ function copiarImagen() {
 
         const originalWidth = zona.style.width;
         const originalMaxWidth = zona.style.maxWidth;
-        zona.style.width = "900px";
-        zona.style.maxWidth = "900px";
+        zona.style.width = "1200px";
+        zona.style.maxWidth = "1200px";
         zona.classList.add("capture-mode");
 
         const otRows = document.querySelectorAll("#tablaOT tr");
@@ -440,12 +440,12 @@ function copiarImagen() {
         };
 
         html2canvas(zona, {
-            scale: 3,
+            scale: 2,
             backgroundColor: "#ffffff",
             logging: false,
             useCORS: true,
             allowTaint: true,
-            windowWidth: 900,
+            windowWidth: 1200,
             scrollX: 0,
             scrollY: 0,
         }).then((canvas) => {
