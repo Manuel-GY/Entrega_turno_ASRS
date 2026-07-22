@@ -392,8 +392,16 @@ function copiarImagen() {
         const otRows = document.querySelectorAll("#tablaOT tbody tr");
         const comments = [];
         otRows.forEach(tr => {
-            const inp = tr.querySelector(".inp-ot");
-            if (inp && inp.value.trim()) comments.push(inp.value.trim());
+            const ot = tr.querySelector(".inp-ot");
+            const obs = tr.querySelector(".inp-obs");
+            const otVal = ot ? ot.value.trim() : "";
+            const obsVal = obs ? obs.value.trim() : "";
+            if (otVal || obsVal) {
+                const parts = [];
+                if (otVal) parts.push(otVal);
+                if (obsVal) parts.push(obsVal);
+                comments.push(parts.join(": "));
+            }
         });
         let footerEl = null;
         if (comments.length > 0) {
