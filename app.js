@@ -95,6 +95,27 @@ function escapeHTML(str) {
     return str.toString().replace(/[&<>'"]/g, (ch) => map[ch] || ch);
 }
 
+function animateKPI(elementId, targetValue) {
+    const el = document.getElementById(elementId);
+    const num = parseFloat(targetValue);
+    if (isNaN(num)) {
+        el.textContent = targetValue;
+        return;
+    }
+    const duration = 600;
+    const startTime = performance.now();
+    const startVal = 0;
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = startVal + (num - startVal) * eased;
+        el.textContent = current.toFixed(1);
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
 function setLoading(on) {
     document.getElementById("loading").style.display = on ? "block" : "none";
     document.getElementById("btnBuscar").disabled = on;
@@ -242,9 +263,7 @@ async function cargarHistorial() {
 // ---- RENDERIZAR ----
 function renderizar(data, fecha, turno, desdeBD = false) {
     document.getElementById("emptyState").style.display = "none";
-    document.getElementById("reportContent").style.display = "flex";
-    document.getElementById("reportContent").style.flexDirection = "column";
-    document.getElementById("reportContent").style.gap = "16px";
+    document.getElementById("reportContent").className = "active";
     document.getElementById("btnGuardar").style.display = "";
     document.getElementById("btnCapture").style.display = "";
 
@@ -324,8 +343,8 @@ function renderizar(data, fecha, turno, desdeBD = false) {
     const avgIn = data.kpis?.inbound ?? "\u2014";
     const avgOut = data.kpis?.outbound ?? "\u2014";
 
-    document.getElementById("kpiIn").textContent = avgIn;
-    document.getElementById("kpiOut").textContent = avgOut;
+    animateKPI("kpiIn", avgIn);
+    animateKPI("kpiOut", avgOut);
 
     // Bar widths
     const inNum = parseFloat(avgIn);

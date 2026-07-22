@@ -31,23 +31,10 @@
             --blue: #2563eb;
             --purple: #7c3aed;
             --amber: #f59e0b;
-        }
-
-        [data-theme="dark"] {
-            --bg: #090d16;
-            --sidebar-bg: #111827;
-            --card-bg: #1f2937;
-            --text: #f3f4f6;
-            --muted: #9ca3af;
-            --border: rgba(255,255,255,0.08);
-            --accent: #38bdf8;
-            --input-bg: #111827;
-            --input-focus: #111827;
-            --td-hover: #111827;
-            --row-border: rgba(255,255,255,0.04);
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+            --navy: #0b2545;
+            --focus-ring: rgba(37,99,235,0.15);
+            --shadow-badge: 0 4px 14px -3px rgba(11,37,69,0.35);
+            --shadow-header: 0 4px 20px -4px rgba(11,37,69,0.4);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -128,7 +115,7 @@
         }
         .control-group input:focus, .control-group select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(11,37,69,0.08);
+            box-shadow: 0 0 0 3px var(--focus-ring);
         }
 
         /* ============ BOTONES ============ */
@@ -163,9 +150,9 @@
         .btn-dark {
             background: linear-gradient(135deg, var(--accent), #1e3a5f);
             color: var(--accent2);
-            box-shadow: 0 2px 8px -2px rgba(11,37,69,0.4);
+            box-shadow: var(--shadow-badge);
         }
-        .btn-dark:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-dark:hover:not(:disabled) { box-shadow: 0 4px 14px -2px rgba(11,37,69,0.5); }
         .btn-save {
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff;
@@ -213,7 +200,28 @@
         .hist-item.turno-noche { border-left-color: var(--purple); }
         .hist-item strong { display: block; color: var(--text); font-size: 12px; margin-bottom: 2px; }
 
-        #loading { display: none; text-align: center; color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; padding: 6px 0; }
+        #loading {
+            display: none;
+            text-align: center;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 6px 0;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #loading::before {
+            content: '';
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ============ MAIN ============ */
         .main {
@@ -239,20 +247,10 @@
             border-radius: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 14px -3px rgba(11,37,69,0.35);
+            box-shadow: var(--shadow-badge);
         }
 
         /* ============ ZONA CAPTURA ============ */
-        .zona-logo-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px 24px;
-            box-shadow: var(--shadow-sm);
-        }
         #zonaCaptura {
             max-width: 1400px;
             width: 100%;
@@ -273,7 +271,7 @@
             gap: 24px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 20px -4px rgba(11,37,69,0.4);
+            box-shadow: var(--shadow-header);
         }
         .report-header::after {
             content: '';
@@ -293,14 +291,14 @@
             flex: 1;
         }
         .report-header-info h1 {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 4px;
         }
         .report-header-info p {
-            font-size: 11px;
+            font-size: 13px;
             color: rgba(255,255,255,0.6);
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -520,8 +518,8 @@
         }
 
         th {
-            background: #f8fafc;
-            color: #475569;
+            background: var(--input-bg);
+            color: var(--muted);
             padding: 12px 12px;
             text-align: center;
             font-weight: 800;
@@ -530,7 +528,6 @@
             letter-spacing: 1px;
             border-bottom: 2px solid var(--border);
         }
-        th:first-child { border-radius: 0; }
 
         td {
             padding: 10px 12px;
@@ -542,7 +539,7 @@
         }
 
         /* Zebra */
-        tbody tr:nth-child(odd) td { background: rgba(11,37,69,0.015); }
+        tbody tr:nth-child(odd) td { background: var(--row-border); }
         tbody tr:nth-child(even) td { background: var(--card-bg); }
 
         /* Row status borders */
@@ -602,7 +599,33 @@
             margin-top: 1px;
         }
 
+        #reportContent {
+            display: none;
+        }
+        #reportContent.active {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
         /* ============ BOTTOM SECTION: OT ============ */
+        .table-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: stretch;
+        }
+        .scroll-wrapper { overflow-x: auto; }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--muted);
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
         .card-ot {
             border-top: 3px solid var(--accent);
         }
@@ -611,7 +634,7 @@
             align-items: center;
             gap: 10px;
             padding: 14px 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: linear-gradient(135deg, var(--input-bg) 0%, var(--bg) 100%);
             border-bottom: 1px solid var(--border);
             margin: 0;
         }
@@ -648,23 +671,21 @@
             letter-spacing: 1.2px;
             border: none;
         }
-        .ot-table thead th:first-child { border-radius: 0; }
-        .ot-table thead th:last-child { border-radius: 0; }
         .ot-table tbody td {
             padding: 5px 8px;
             height: 40px;
             border-bottom: 1px solid var(--row-border);
             vertical-align: middle;
         }
-        .ot-table tbody tr:nth-child(odd) td { background: rgba(11,37,69,0.015); }
-        .ot-table tbody tr:hover td { background: rgba(37,99,235,0.04); }
+        .ot-table tbody tr:nth-child(odd) td { background: var(--row-border); }
+        .ot-table tbody tr:hover td { background: var(--td-hover); }
         .ot-table tbody tr:last-child td { border-bottom: none; }
         .ot-table .ot-hora {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
             font-size: 12px;
             color: var(--navy);
-            background: rgba(11,37,69,0.04);
+            background: var(--row-border);
             border-radius: 4px;
             padding: 4px 8px;
             display: inline-block;
@@ -687,7 +708,7 @@
         .ot-table .ot-input:focus {
             background: #fff;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+            box-shadow: 0 0 0 3px var(--focus-ring);
         }
         .ot-table .ot-input:hover:not(:focus) {
             background: var(--input-bg);
@@ -723,7 +744,7 @@
             opacity: 0.3;
             pointer-events: none;
         }
-        .empty-state h1 { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 10px; position: relative; }
+        .empty-state h1 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 10px; position: relative; }
         .empty-state p { font-size: 14px; color: var(--muted); max-width: 500px; line-height: 1.5; position: relative; }
         .empty-state .empty-icon {
             width: 64px; height: 64px; margin-bottom: 20px;
@@ -760,6 +781,25 @@
             border-radius: 12px !important;
             border: 1px solid var(--border) !important;
             box-shadow: var(--shadow-lg) !important;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) {
+            .table-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow: auto; }
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                max-height: none;
+            }
+            .main { padding: 16px; }
+            .kpi-grid { grid-template-columns: 1fr; }
+            .report-header { flex-direction: column; text-align: center; }
+            .report-header img { margin-bottom: 8px; }
         }
     </style>
 </head>
@@ -807,7 +847,7 @@
             <div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">Cargando...</div>
         </div>
     </div>
-    <div style="margin-top:auto; padding-top:20px; border-top:1px solid var(--border); font-size:10px; color:var(--muted); text-align:center; font-weight:600; letter-spacing:0.5px;">
+    <div class="sidebar-footer">
         Desarrollado por Manuel Rivera - ASRS
     </div>
 </aside>
@@ -818,13 +858,6 @@
     </div>
 
     <div id="zonaCaptura">
-        <div class="zona-logo-header">
-            <img src="logo-goodyear.png" alt="Goodyear" style="height:40px; width:auto;">
-            <div>
-                <h2 style="font-size:16px; font-weight:900; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; margin:0; line-height:1.2;">Entrega de Turno ASRS</h2>
-                <p style="font-size:10px; color:var(--muted); margin:0; letter-spacing:0.75px; text-transform:uppercase; font-weight:600;">Automated Storage & Retrieval System</p>
-            </div>
-        </div>
 
         <div id="emptyState" class="empty-state">
             <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -845,7 +878,7 @@
             </div>
         </div>
 
-        <div id="reportContent" style="display:none">
+        <div id="reportContent">
             <!-- Report Header Banner -->
             <div class="report-header">
                 <img src="logo-goodyear.png" alt="Goodyear">
@@ -905,12 +938,12 @@
             </div>
 
             <!-- Main Table + OT Side by Side -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="table-grid">
                 <div class="card report-table-card">
                     <div class="report-table-header">
                         <h3>Detalle Horario</h3>
                     </div>
-                    <div style="overflow-x:auto">
+                    <div class="scroll-wrapper">
                         <table id="tablaDatos">
                             <thead>
                                 <tr>
@@ -930,7 +963,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         <span class="ot-title-text">Ordenes de Trabajo y Comentarios</span>
                     </div>
-                    <div style="overflow-x:auto">
+                    <div class="scroll-wrapper">
                         <table class="ot-table">
                             <thead>
                                 <tr>
